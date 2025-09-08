@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const env = require('./env'); // ✅ make sure you import env.js
+const env = require('./env'); // make sure you import env.js
 
 const connect = async () => {
   try {
