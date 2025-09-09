@@ -1,41 +1,11 @@
-const http = require('http');
-const app = require('./app');
-const env = require('./config/env');
-const db = require('./config/db');
-const agendaService = require('./services/agenda');
-const logger = require('./utils/logger');
+import express from 'express';
+import cors from 'cors';
+import authRoutes from './routes/authRoutes.js';
 
-const server = http.createServer(app);
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-async function start() {
-  try {
-    await db.connect();
-    logger.info('MongoDB connected');
+app.use('/auth', authRoutes);
 
-    // start agenda (background jobs)
-    await agendaService.start();
-    logger.info('Agenda started');
-
-    server.listen(env.PORT, () => {
-      logger.info(`Server running in ${env.NODE_ENV} mode on port ${env.PORT}`);
-      logger.info(`API base: http://localhost:${env.PORT}/api`);
-    });
-  } catch (err) {
-    logger.error('Failed to start server', err);
-    process.exit(1);
-  }
-}
-
-start();
-
-// Graceful shutdown
-process.on('SIGINT', async () => {
-  logger.info('SIGINT received: shutting down');
-  try {
-    await agendaService.stop();
-    process.exit(0);
-  } catch (err) {
-    logger.error(err);
-    process.exit(1);
-  }
-});
+app.listen(5000, () => console.log('Backend running on port 5000'));
